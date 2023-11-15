@@ -1,0 +1,160 @@
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">    
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">  
+    <title>Pagina de prueba del bootstrap</title>
+    <!-- Just for debugging purposes. Don't actually copy this line! -->
+    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->     
+     <link rel="stylesheet" type="text/css" href="{{asset('public/bootstrap.css')}}">   
+  </head>  
+<body> 
+  
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <form action="{{action('BuscadorController@index')}}" method="POST">
+          {{csrf_field()}}
+          <div class="form-group">
+            <label>Buscar</label>
+            <input type="text" name="criterio" value="{{$criterio}}" placeholder="Escribir nombre personal, nombre del cliente, numero de placa " class="form-control"></input>
+          </div>
+          <button class="btn btn-success">Buscar</button>
+        </form>
+      </div>
+    </div>
+    <div id="app" class="row">  
+      <div v-if="registros.length!=0" class='col-sm-12 col-md-12 col-xs-12'>
+        <div class="panel panel-default">
+          <div class="panel-heading">
+          <h3 class="panel-title">Busqueda rapida</h3>
+        </div>
+        <div class="panel-body">
+          <div class="form-group">
+            <label>Tipo de Servicio</label>
+            <select class="form-control" v-model="filtro_tipo" >
+              <option v-for="tip in tipos" :value="tip">@{{tip}}</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Modelos</label>
+            <select class="form-control" v-model="filtro_modelo" >
+              <option v-for="mod in modelos" :value="mod">@{{mod}}</option>
+            </select>
+          </div>
+        </div>
+        
+
+        </div>
+      </div>
+        <div v-if="registros.length!=0" class='col-sm-12 col-md-12 col-xs-12'>
+        <h1>Resultados de busqueda</h1>
+        <table class="table">
+          <tr>
+            <th>Cliente</th>
+            <th>Placa</th>
+            <th>Modelo / Año</th>
+            <th>Precio</th>
+            <th>Tipo de servicio</th>
+            <th>Personal</th>
+          </tr>
+
+          <tr v-for="elemento in registros_final">
+            <td>@{{elemento.nombre}}</td>
+            <td>@{{elemento.placa}}</td>
+            <td>@{{elemento.modelo+' '+elemento.anio}}</td>
+            <td>@{{elemento.precio}}</td>
+            <td>@{{elemento.tipo_servicio}}</td>
+            <td>@{{elemento.personal}}</td>
+          </tr>
+
+        </table>
+      </div>
+    </div> 
+  </div>
+<script type="text/javascript" src="{{asset('public/jquery.min.js')}}"></script> 
+<script type="text/javascript" src="{{asset('public/bootstrap.min.js')}}"></script> 
+<script type="text/javascript" src="{{asset('public/vue.js')}}"></script>
+
+<script type="text/javascript">
+  new Vue({
+    el:'#app',
+    data:{
+      registros:<?php echo json_encode($registros);?>
+      ,filtro_tipo:'Todos'
+      ,filtro_modelo:'Todos'
+      ,tipos:[]
+      ,modelos:[]
+      }
+    ,methods:{
+      borrar:function(){
+        this.registros_final.splice(0,this.registros_final.length);
+      }
+      ,filtrar:function(){
+        this.borrar();
+        for(i=0;i<this.registros.length;i++){
+          bandera=false;
+          if(this.filtro_tipo=='Todos')
+            bandera=true;
+          else{
+            if (this.filtro_tipo==this.registros[i].tipo_servicio)
+              bandera=true;
+          }
+          if(bandera){
+            this.registros_final.push(this.registros[i]);
+          }
+        }
+      }
+    }
+    ,computed:{
+      registros_final:function(){
+        lista=[];
+
+        self=this;
+        lista=this.registros.filter(function(item){
+          bandera_tip=false;
+          bandera_mod=false;
+          if(self.filtro_tipo=='Todos')
+            bandera_tip=true;
+          else{
+            if (self.filtro_tipo==item.tipo_servicio)
+              bandera_tip=true;
+          }
+           if(self.filtro_modelo=='Todos')
+            bandera_mod=true;
+          else{
+            if (self.filtro_modelo==item.modelo)
+              bandera_mod=true;
+          }
+          
+          return bandera_tip&&bandera_mod;
+        })
+        return lista;
+      }
+    }
+    ,created(){
+      this.tipos.push('Todos');
+      this.modelos.push('Todos');
+      for(i=0;i<this.registros.length;i++){
+        if(this.tipos.indexOf(this.registros[i].tipo_servicio)==-1){
+          this.tipos.push(this.registros[i].tipo_servicio);
+        }
+
+         if(this.modelos.indexOf(this.registros[i].modelo)==-1){
+          this.modelos.push(this.registros[i].modelo);
+        }
+      }
+      //console.log(this.tipos);
+    }
+  })
+</script>
+</body>
+
+</html>

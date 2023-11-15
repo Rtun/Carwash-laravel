@@ -1,0 +1,20 @@
+administrativo
+corre:Jack@gmail.com
+contraseña:123456
+permisos(Todos)
+
+gerente
+corre:russell@hotmail.com
+contraseña:123456
+permisos(personal,tiposocio,materiasprima)
+
+
+socio
+corre:russelltun.ek@gmail.com
+contraseña:123456
+permiso(solo al perfil)
+
+personal
+corre:mario@gmail.com
+contraseña:123456
+permisos(servicio, rentas,tiposervicio, materiasprima)
